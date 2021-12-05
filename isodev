@@ -1,81 +1,81 @@
 #!/bin/bash
 
 help1 () {
-  echo "\nIsoDev"
-  echo "The Isolated Development CLI"
-  echo "Version 0.1.0\n"
+  echo -e "\nIsoDev"
+  echo -e "The Isolated Development CLI"
+  echo -e "Version 0.1.0\n"
 
-  echo "Usage: isodev [command] \n"
+  echo -e "Usage: isodev [command] \n"
 
-  echo "Commands:"
-  echo "   generate [-g]  Generate an isolated development enviornment (use with -h afterwards to see options)"
-  echo "   run      [-r]  Run the isolated development enviornment (use with -h afterwards to see options)"
-  echo "   help           Help"
+  echo -e "Commands:"
+  echo -e "   generate [-g]  Generate an isolated development enviornment (use with -h afterwards to see options)"
+  echo -e "   run      [-r]  Run the isolated development enviornment (use with -h afterwards to see options)"
+  echo -e "   help           Help"
 }
 
 help2 () {
-  echo "\nGenerate help\n"
+  echo -e "\nGenerate help\n"
   
-  echo "isodev generate [options] \n"
+  echo -e "isodev generate [options] \n"
 
-  echo "Available Generations:"
-  echo "   node [-n]     NodeJS"
-  echo "   python [-p]   Python3"
-  echo "   go [-g]       Golang"
+  echo -e "Available Generations:"
+  echo -e "   node [-n]     NodeJS"
+  echo -e "   python [-p]   Python3"
+  echo -e "   go [-g]       Golang"
 }
 
 run() {
   if [[ $1 == "help" ]] || [[ $1 == "-h" ]]; then 
-    echo "Run options:"
-    echo "   *             Destroy and run isolated enviornment"
-    echo "   reload [-l]   Reload isolated enviornment"
+    echo -e "Run options:"
+    echo -e "   *             Destroy and run isolated enviornment"
+    echo -e "   reload [-l]   Reload isolated enviornment"
   elif [[ $1 == "reload" ]] || [[ $1 == "-l" ]]; then
-  echo "Reload"
+  echo -e "Reload"
     vagrant reload --provision
   else 
-    echo "Normal"
+    echo -e "Normal"
     vagrant destroy -f
     vagrant up --provision
   fi
 
-  echo "\n"
+  echo -e "\n"
 
   vagrant ssh-config
 
-  echo "\n Copy and paste the above section into your ssh config to add vscode ssh capabilities"
+  echo -e "\n Copy and paste the above section into your ssh config to add vscode ssh capabilities"
 }
 
 generate_vagrant() {
-  echo "$3"
+  echo -e "$3"
   : > $PWD/Vagrantfile
-  echo "# -*- mode: ruby -*-" >> $PWD/Vagrantfile
-  echo "# vi: set ft=ruby :\n" >> $PWD/Vagrantfile
+  echo -e "# -*- mode: ruby -*-" >> $PWD/Vagrantfile
+  echo -e "# vi: set ft=ruby :\n" >> $PWD/Vagrantfile
 
-  echo "\$script = <<-SCRIPT" >> $PWD/Vagrantfile
+  echo -e "\$script = <<-SCRIPT" >> $PWD/Vagrantfile
   if [[ $1 == "node" ]] || [[ $1 == "-n" ]]; then
-    echo "curl -fsSL https://deb.nodesource.com/setup_17.x | sudo -E bash -" >> $PWD/Vagrantfile
-    echo "sudo apt-get install -y nodejs" >> $PWD/Vagrantfile
+    echo -e "curl -fsSL https://deb.nodesource.com/setup_17.x | sudo -E bash -" >> $PWD/Vagrantfile
+    echo -e "sudo apt-get install -y nodejs" >> $PWD/Vagrantfile
   elif [[ $1 == "python" ]] || [[ $1 == "-p" ]]; then
-    echo "sudo apt install build-essential -y" >> $PWD/Vagrantfile
-    echo "sudo apt install python3 python3-dev -y" >> $PWD/Vagrantfile
+    echo -e "sudo apt install build-essential -y" >> $PWD/Vagrantfile
+    echo -e "sudo apt install python3 python3-dev -y" >> $PWD/Vagrantfile
   else 
     true
   fi
-  echo "mkdir /home/vagrant/isodev" >> $PWD/Vagrantfile
-  echo "cp -fr -a /vagrant/. /home/vagrant/isodev/" >> $PWD/Vagrantfile
-  echo "SCRIPT\n" >> $PWD/Vagrantfile
+  echo -e "mkdir /home/vagrant/isodev" >> $PWD/Vagrantfile
+  echo -e "cp -fr -a /vagrant/. /home/vagrant/isodev/" >> $PWD/Vagrantfile
+  echo -e "SCRIPT\n" >> $PWD/Vagrantfile
 
-  echo "Vagrant.configure("2") do |config|" >> $PWD/Vagrantfile
-  echo "\tconfig.vm.provider \"virtualbox\" do |v|" >> $PWD/Vagrantfile
-  echo "\t\tv.memory = 512" >> $PWD/Vagrantfile
-  echo "\t\tv.cpus = 1" >> $PWD/Vagrantfile
-  echo "\t\tv.name = \"isodev\"" >> $PWD/Vagrantfile
-  echo "\tend\n" >> $PWD/Vagrantfile
+  echo -e "Vagrant.configure("2") do |config|" >> $PWD/Vagrantfile
+  echo -e "\tconfig.vm.provider \"virtualbox\" do |v|" >> $PWD/Vagrantfile
+  echo -e "\t\tv.memory = 512" >> $PWD/Vagrantfile
+  echo -e "\t\tv.cpus = 1" >> $PWD/Vagrantfile
+  echo -e "\t\tv.name = \"isodev\"" >> $PWD/Vagrantfile
+  echo -e "\tend\n" >> $PWD/Vagrantfile
 
-  echo "\tconfig.vm.box = \"hashicorp/bionic64\"" >> $PWD/Vagrantfile
-  echo "\tconfig.vm.synced_folder \".\", \"/vagrant\", type: \"virtualbox\"" >> $PWD/Vagrantfile
-  echo "\tconfig.vm.provision \"shell\", inline: \$script" >> $PWD/Vagrantfile
-  echo "end" >> $PWD/Vagrantfile
+  echo -e "\tconfig.vm.box = \"hashicorp/bionic64\"" >> $PWD/Vagrantfile
+  echo -e "\tconfig.vm.synced_folder \".\", \"/vagrant\", type: \"virtualbox\"" >> $PWD/Vagrantfile
+  echo -e "\tconfig.vm.provision \"shell\", inline: \$script" >> $PWD/Vagrantfile
+  echo -e "end" >> $PWD/Vagrantfile
 }
 
 if [[ $# -eq 0 ]]; then
@@ -87,7 +87,7 @@ elif [[ $1 == "run" ]] || [[ $1 == "-r" ]]; then
 else
   if [[ $2 == "-h" ]] || [[ $2 == "help" ]]; then
     help2
-    echo $2
+    echo -e $2
   else
     generate_vagrant $2
   fi
