@@ -11,6 +11,7 @@ help1 () {
   echo -e "Commands:"
   echo -e "   generate [-g]  Generate an isolated development enviornment (use with -h afterwards to see options)"
   echo -e "   run      [-r]  Run the isolated development enviornment (use with -h afterwards to see options)"
+  echo -e "   clean    [-c]  Clean and delete all Vagrant Boxes on machine"
   echo -e "   help           Help"
 }
 
@@ -86,6 +87,13 @@ generate() {
   fi
 }
 
+# Clean command
+clean() {
+  # Find all the boxes and delete each one
+  vagrant box list | cut -f 1 -d ' ' | xargs -L 1 vagrant box remove --all --force
+  echo "Cleaned Vagrant Boxes"
+}
+
 # Command check
 if [[ $# -eq 0 ]]; then
   help1
@@ -95,6 +103,9 @@ elif [[ $1 == "generate" ]] || [[ $1 == "-g" ]]; then
   exit
 elif [[ $1 == "run" ]] || [[ $1 == "-r" ]]; then 
   run $2
+  exit
+elif [[ $1 == "clean" ]] || [[ $1 == "-c" ]]; then 
+  clean
   exit
 else
   help1
