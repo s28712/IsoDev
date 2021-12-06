@@ -59,11 +59,10 @@ generate() {
 
     # Check for language configuration
     if [[ $1 == "node" ]] || [[ $1 == "-n" ]]; then
-      echo -e "curl -fsSL https://deb.nodesource.com/setup_17.x | sudo -E bash -" >> $PWD/Vagrantfile
-      echo -e "sudo apt-get install -y nodejs" >> $PWD/Vagrantfile
+      echo -e "curl -fsSL https://rpm.nodesource.com/setup_17.x | bash -" >> $PWD/Vagrantfile
+      echo -e "sudo yum install -y nodejs" >> $PWD/Vagrantfile
     elif [[ $1 == "python" ]] || [[ $1 == "-p" ]]; then
-      echo -e "sudo apt install build-essential -y" >> $PWD/Vagrantfile
-      echo -e "sudo apt install python3 python3-dev -y" >> $PWD/Vagrantfile
+      echo -e "sudo yum install -y python3" >> $PWD/Vagrantfile
     else 
       true
     fi
@@ -79,13 +78,14 @@ generate() {
 
     echo -e "Vagrant.configure("2") do |config|" >> $PWD/Vagrantfile
     echo -e "\tconfig.vm.provider \"virtualbox\" do |v|" >> $PWD/Vagrantfile
-    echo -e "\t\tv.memory = 512" >> $PWD/Vagrantfile
+    echo -e "\t\tv.memory = 256" >> $PWD/Vagrantfile
     echo -e "\t\tv.cpus = 1" >> $PWD/Vagrantfile
+    echo -e "\t\tv.customize [\"modifyvm\", :id, \"--cpuexecutioncap\", \"42\"]" >> $PWD/Vagrantfile
     echo -e "\t\tv.name = \"isodev\"" >> $PWD/Vagrantfile
     echo -e "\tend\n" >> $PWD/Vagrantfile
 
-    echo -e "\tconfig.vm.box = \"hashicorp/bionic64\"" >> $PWD/Vagrantfile
-    echo -e "\tconfig.vm.synced_folder \".\", \"/vagrant\", type: \"virtualbox\"" >> $PWD/Vagrantfile
+    echo -e "\tconfig.vm.box = \"centos/7\"" >> $PWD/Vagrantfile
+    echo -e "\tconfig.vm.synced_folder \".\", \"/vagrant\"" >> $PWD/Vagrantfile
     echo -e "\tconfig.vm.provision \"shell\", inline: \$script" >> $PWD/Vagrantfile
     echo -e "end" >> $PWD/Vagrantfile
   fi
