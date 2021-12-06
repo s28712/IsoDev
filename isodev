@@ -12,6 +12,7 @@ help1 () {
   echo -e "   generate [-g]  Generate an isolated development enviornment (use with -h afterwards to see options)"
   echo -e "   run      [-r]  Run the isolated development enviornment (use with -h afterwards to see options)"
   echo -e "   clean    [-c]  Clean and delete all Vagrant Boxes on machine"
+  echo -e "   docker   [-d]  Instead of using vagrant use docker (use with -h afterwards to see options)"
   echo -e "   help           Help"
 }
 
@@ -77,17 +78,72 @@ generate() {
     echo -e "SCRIPT\n" >> $PWD/Vagrantfile
 
     echo -e "Vagrant.configure("2") do |config|" >> $PWD/Vagrantfile
-    echo -e "\tconfig.vm.provider \"virtualbox\" do |v|" >> $PWD/Vagrantfile
-    echo -e "\t\tv.memory = 256" >> $PWD/Vagrantfile
-    echo -e "\t\tv.cpus = 1" >> $PWD/Vagrantfile
-    echo -e "\t\tv.customize [\"modifyvm\", :id, \"--cpuexecutioncap\", \"42\"]" >> $PWD/Vagrantfile
-    echo -e "\t\tv.name = \"isodev\"" >> $PWD/Vagrantfile
-    echo -e "\tend\n" >> $PWD/Vagrantfile
+    echo -e "  config.vm.provider \"virtualbox\" do |v|" >> $PWD/Vagrantfile
+    echo -e "    v.memory = 256" >> $PWD/Vagrantfile
+    echo -e "    v.cpus = 1" >> $PWD/Vagrantfile
+    echo -e "    v.customize [\"modifyvm\", :id, \"--cpuexecutioncap\", \"42\"]" >> $PWD/Vagrantfile
+    echo -e "    v.name = \"isodev\"" >> $PWD/Vagrantfile
+    echo -e "  end\n" >> $PWD/Vagrantfile
 
-    echo -e "\tconfig.vm.box = \"centos/7\"" >> $PWD/Vagrantfile
-    echo -e "\tconfig.vm.synced_folder \".\", \"/vagrant\"" >> $PWD/Vagrantfile
-    echo -e "\tconfig.vm.provision \"shell\", inline: \$script" >> $PWD/Vagrantfile
+    echo -e "  config.vm.box = \"centos/7\"" >> $PWD/Vagrantfile
+    echo -e "  config.vm.synced_folder \".\", \"/vagrant\"" >> $PWD/Vagrantfile
+    echo -e "  config.vm.provision \"shell\", inline: \$script" >> $PWD/Vagrantfile
     echo -e "end" >> $PWD/Vagrantfile
+  fi
+}
+
+# Docker command
+docker() {
+  # Check for help
+  if [[ $1 == "" ]] || [[ $1 == "-h" ]] || [[ $1 == "help" ]]; then
+    # Print help prompt to console
+    echo -e "\Docker help\n"
+    echo -e "isodev docker [options] \n"
+    echo -e "Available Generations:"
+    echo -e "   node [-n]     NodeJS Docker configuration"
+    echo -e "   python [-p]   Python3 Docker configuration"
+    echo -e "   go [-g]       Golang Docker configuration"
+    echo -e "   run [-r]      Run the application (with npm command afterwards)"
+  # Create node configuration
+  elif [[ $1 == "-n" ]] || [[ $1 == "node" ]]; then
+    # Create Dockerfile
+    : > $PWD/Dockerfile
+    echo -e "FROM node\n" >> $PWD/Dockerfile
+    echo -e "ARG cmd=\"\"" >> $PWD/Dockerfile
+    echo -e "ENV arg=\$cmd\n" >> $PWD/Dockerfile
+    echo -e "WORKDIR /app\n" >> $PWD/Dockerfile
+    echo -e "CMD \$arg" >> $PWD/Dockerfile
+    
+    # Create docker-compose.yml
+    : > $PWD/docker-compose.yml
+    echo -e "services:" >> $PWD/docker-compose.yml
+    echo -e "  web:" >> $PWD/docker-compose.yml
+    echo -e "    build: " >> $PWD/docker-compose.yml
+    echo -e "      context: ." >> $PWD/docker-compose.yml
+    echo -e "      args: " >> $PWD/docker-compose.yml
+    echo -e "        cmd: \${ARGUMENT}" >> $PWD/docker-compose.yml
+    echo -e "    volumes:" >> $PWD/docker-compose.yml
+    echo -e "      - type: bind" >> $PWD/docker-compose.yml
+    echo -e "        source: \${PWD}/." >> $PWD/docker-compose.yml
+    echo -e "        target: /app/" >> $PWD/docker-compose.yml
+    echo -e "    ports: " >> $PWD/docker-compose.yml
+    echo -e "      - 3000:3000" >> $PWD/docker-compose.yml
+
+    # Confirmation
+    echo "Created Node Docker configuration"
+
+  # Run the application
+  elif [[ $2 == "up" ]] || [[ $2 == "-r" ]] || [[ $2 == "run" ]]; then
+    # Check for collection of remaining arguments
+    if [[ ${@:3} == "" ]]; then
+      echo "No npm command provided. Run isodev -d -r npm <command>"
+    # Run docker compose based on arguments provided
+    else
+      ARGUMENT="${@:3}" docker-compose up --build
+    fi
+  # No valid options
+  else
+    echo "No valid option provided. Run with [-h] to see options"
   fi
 }
 
@@ -107,6 +163,9 @@ elif [[ $1 == "generate" ]] || [[ $1 == "-g" ]]; then
   exit
 elif [[ $1 == "run" ]] || [[ $1 == "-r" ]]; then 
   run $2
+  exit
+elif [[ $1 == "docker" ]] || [[ $1 == "-d" ]]; then 
+  docker "$2" "${@:2}"
   exit
 elif [[ $1 == "clean" ]] || [[ $1 == "-c" ]]; then 
   clean

@@ -3,7 +3,7 @@ services:
     build: 
       context: .
       args: 
-        cmd: ${ARG}
+        cmd: ${ARGUMENT}
     volumes:
       - type: bind
         source: ${PWD}/.

@@ -5,4 +5,4 @@ ENV arg=$cmd
 
 WORKDIR /app
 
-CMD npm $arg
+CMD $arg
