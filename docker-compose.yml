@@ -1,0 +1,12 @@
+services:
+  web:
+    build: 
+      context: .
+      args: 
+        cmd: ${ARG}
+    volumes:
+      - type: bind
+        source: ${PWD}/.
+        target: /app/
+    ports: 
+      - 3000:3000
